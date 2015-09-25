@@ -38,24 +38,26 @@ import diego.ufu.workloadoutput.calculus.TotalTimeCalculus;
  * 		This program was created to analyze data from DebugMalloc.
  * 		Therefore, the content of the files should not be changed from its default if 
  * 	you want to keep the whole structure of WC_Analysis.
- * 		Adding a new parameter is not hard, but you will have to customize other classes as well, 
- * 	including the reader, beans (data) and the analysis (calculus) classes.
+ * 		To add a new parameter into the files (like function return pointer) 
+ *  you will have to customize other classes as well, including the reader (to read the new data), 
+ *  beans (data in memory) and the analysis (calculus) classes.
  * 
- * ADDING A NEW EXPERIMENT:
- * 		For each experiment that will be analyzed by the WC_Analysis you should
- * add an experiment with the path of the input and output files (see addExperiments() 
- * for an example).
+ * (+) ADDING A NEW EXPERIMENT:
+ * 		For each experiment to be analyzed by the WC_Analysis you should
+ * add an {@link Experiment} object to list of experiments. Each {@link Experiment} must contain 
+ * the path of the input and output files (see addExperiments() for an example). You can use
+ * {@link ExperimentBuilder} for a more friendly builder interface.
  * 
- * ADDING A NEW ANALYSIS:
- * 		For a new analysis you have to implement the interface {@link CalculusModule}.
- * 	After that you have to add the new module to the {@link StatisticAnalysis} object 
+ * (+) ADDING A NEW ANALYSIS:
+ * 		In order to create a new analysis you must implement the interface {@link CalculusModule}.
+ * After the implementation you should add it to the {@link StatisticAnalysis} object 
  * (see addCalculusModule() for an example).
  * 
- * REMOVING/DISABLING AN ANALYSIS:
+ * (+) REMOVING/DISABLING AN ANALYSIS:
  * 		Just comment the line in addCalculusModule() of the correspondent analysis.
  * The analysis is not performed if not added into the {@link StatisticAnalysis} object. 
  * 
- * INCREASING/DECREASING the number of replications:
+ * (+) INCREASING/DECREASING the number of replications:
  * 		Just change the variables REPLICATION_BEGIN and REPLICATION_END.
  * 
  * 
