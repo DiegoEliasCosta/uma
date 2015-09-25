@@ -27,7 +27,7 @@ public class SizeFrequencyCalculus implements CalculusModule {
 	@Override
 	public String getHeader() {
 		
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		
 		buffer.append("Frequencia - C1" + SEPARATOR)
 		.append("Frequencia - C2" + SEPARATOR)

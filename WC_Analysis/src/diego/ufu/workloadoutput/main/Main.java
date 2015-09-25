@@ -29,9 +29,10 @@ public class Main {
 	/** 
 	 * Input File Format
 	 * Current format = path + fileName + _ + replication + .csv 
-	 *					(eg. path = C:\ filename = MySQL_malloc | 3 Replications
+	 *					(eg. path = "C:\" | filename = "MySQL_malloc" | 3 Replications
 	 *					C:\MySQL_malloc_1.csv, C:\MySQL_malloc_2.csv, C:\MySQL_malloc_3.csv)
-	 * See Main.generateFileName method to check how this is used)
+	 *
+	 * See Main.generateFileName method to check how this is used
 	 */
 	private static String inputFileNameFormat = "%s" + "%s" + "_" + "%s" + ".csv";
 	
@@ -105,7 +106,7 @@ public class Main {
 					 freeFileName);
 			 
 			 // Generate the Report
-			 StringBuffer report = analysis.generateReport(info);
+			 StringBuilder report = analysis.generateReport(info);
 			 
 			 // Add to the report 
 			 programReport.append(report);
@@ -121,9 +122,6 @@ public class Main {
 	 * Generate the FileName of the malloc/free operations based on the
 	 * inputNameFormat variable
 	 * 
-	 * @param fileName
-	 * @param replicationID
-	 * @return
 	 */
 	private static String generateFileName(String fileName, int replicationID) {
 		return String.format(inputFileNameFormat, pathFolder, fileName, replicationID);

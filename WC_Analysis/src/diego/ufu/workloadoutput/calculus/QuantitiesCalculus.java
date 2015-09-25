@@ -64,7 +64,7 @@ public class QuantitiesCalculus implements CalculusModule {
 
 	@Override
 	public String getHeader() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append("# de Alocacoes;")
 			  .append("# de Desalocacoes;")
 			  .append("# de Desalocações NULL;")

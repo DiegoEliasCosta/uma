@@ -18,7 +18,7 @@ public class FrequencyOperationCalculus implements CalculusModule {
 	@Override
 	public String getHeader() {
 
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append("# malloc()" + SEPARATOR)
 		  	  .append("# calloc()" + SEPARATOR)
 		      .append("# realloc()" + SEPARATOR)

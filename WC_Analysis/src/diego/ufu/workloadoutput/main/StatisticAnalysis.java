@@ -6,7 +6,7 @@ import diego.ufu.workloadoutput.calculus.CalculusModule;
 
 public interface StatisticAnalysis {
 	
-	public StringBuffer generateReport(MallocInfo info) throws IOException;
+	public StringBuilder generateReport(MallocInfo info) throws IOException;
 
 	public void addCalculusModule(CalculusModule object);
 

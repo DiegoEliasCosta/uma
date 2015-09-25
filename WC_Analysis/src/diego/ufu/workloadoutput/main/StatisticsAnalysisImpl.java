@@ -24,9 +24,9 @@ public class StatisticsAnalysisImpl implements StatisticAnalysis {
 
 
 	@Override
-	public StringBuffer generateReport(MallocInfo mallocByRep) throws IOException {
+	public StringBuilder generateReport(MallocInfo mallocByRep) throws IOException {
 		
-		StringBuffer stringbuffer = new StringBuffer();
+		StringBuilder stringbuffer = new StringBuilder();
 		
 		for(CalculusModule calculus : calculusSequence) {
 			stringbuffer.append(calculus.calculate(mallocByRep));
@@ -41,7 +41,7 @@ public class StatisticsAnalysisImpl implements StatisticAnalysis {
 	@Override
 	public String printHeader() {
 		
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		
 		for(CalculusModule calculus : calculusSequence) {
 			buffer.append(calculus.getHeader());
