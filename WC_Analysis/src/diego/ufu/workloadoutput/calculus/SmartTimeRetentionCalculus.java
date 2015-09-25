@@ -34,47 +34,41 @@ public class SmartTimeRetentionCalculus implements CalculusModule {
 		StringBuilder buff = new StringBuilder();
 		
 		//buff.append("Tempo de Retencao por Categoria de Tamanho (Tamanho=#)" + SEPARATOR);
-		buff.append("Tempo Retenção Médio - C1" + SEPARATOR)
+		buff.append(
+				"Tempo Retenção Médio - C1" + SEPARATOR)
 		.append("Variância Tempo Retenção - C1" + SEPARATOR)
 		.append("Desvio Padrão Tempo Retenção - C1" + SEPARATOR)
 		.append("Mínimo Tempo Retenção - C1" + SEPARATOR)
 		.append("Máximo Tempo Retenção - C1" + SEPARATOR)
-		.append("Qtd de Alocações Breves - C1" + SEPARATOR)
 		
 		.append("Tempo Retenção Médio - C2" + SEPARATOR)
 		.append("Variância Tempo Retenção - C2" + SEPARATOR)
 		.append("Desvio Padrão Tempo Retenção - C2" + SEPARATOR)
 		.append("Mínimo Tempo Retenção - C2" + SEPARATOR)
 		.append("Máximo Tempo Retenção - C2" + SEPARATOR)
-		.append("Qtd de Alocações Breves - C2" + SEPARATOR)
 		
 		.append("Tempo Retenção Médio - C3" + SEPARATOR)
 		.append("Variância Tempo Retenção - C3" + SEPARATOR)
 		.append("Desvio Padrão Tempo Retenção - C3" + SEPARATOR)
 		.append("Mínimo Tempo Retenção - C3" + SEPARATOR)
 		.append("Máximo Tempo Retenção - C3" + SEPARATOR)
-		.append("Qtd de Alocações Breves - C3" + SEPARATOR)
 		
 		.append("Tempo Retenção Médio - C4" + SEPARATOR)
 		.append("Variância Tempo Retenção - C4" + SEPARATOR)
 		.append("Desvio Padrão Tempo Retenção - C4" + SEPARATOR)
 		.append("Mínimo Tempo Retenção - C4" + SEPARATOR)
-		.append("Máximo Tempo Retenção - C4" + SEPARATOR)
-		.append("Qtd de Alocações Breves - C4" + SEPARATOR)
 		
 		.append("Tempo Retenção Médio - C5" + SEPARATOR)
 		.append("Variância Tempo Retenção - C5" + SEPARATOR)
 		.append("Desvio Padrão Tempo Retenção - C5" + SEPARATOR)
 		.append("Mínimo Tempo Retenção - C5" + SEPARATOR)
 		.append("Máximo Tempo Retenção - C5" + SEPARATOR)
-		.append("Qtd de Alocações Breves - C5" + SEPARATOR)
 		
 		.append("Tempo Retenção Médio - C6" + SEPARATOR)
 		.append("Variância Tempo Retenção - C6" + SEPARATOR)
 		.append("Desvio Padrão Tempo Retenção - C6" + SEPARATOR)
 		.append("Mínimo Tempo Retenção - C6" + SEPARATOR)
 		.append("Máximo Tempo Retenção - C6" + SEPARATOR)
-		.append("Qtd de Alocações Breves - C6" + SEPARATOR)
 		
 		 .append(TimeRetentionCategory.TR_C1.getSup() + SEPARATOR)
 		 .append(TimeRetentionCategory.TR_C2.getSup() + SEPARATOR)
@@ -148,14 +142,12 @@ public class SmartTimeRetentionCalculus implements CalculusModule {
 		
 		long min = Long.MAX_VALUE;
 		long max = Long.MIN_VALUE;
-		int qtyShortTimeAllocations = 0;
 		
 		// Mean
 		for(Long e : list) {
 			sum += e;
 			if(e < min) min = e;
 			if(e > max) max = e;
-			if(e < BILLION) qtyShortTimeAllocations++; // Less than one second
 		} 
 		double mean = sum / (double) list.size(); // average
 		
@@ -176,7 +168,7 @@ public class SmartTimeRetentionCalculus implements CalculusModule {
         max /= BILLION;
 		
 		return mean + SEPARATOR + variance + SEPARATOR + stdDeviation + SEPARATOR + 
-				min + SEPARATOR + max + SEPARATOR + qtyShortTimeAllocations + SEPARATOR;
+				min + SEPARATOR + max + SEPARATOR;
 
 	}
 

@@ -2,8 +2,6 @@ package diego.ufu.workloadoutput.main;
 import java.util.ArrayList;
 import java.util.List;
 
-import diego.ufu.workloadoutput.calculus.AllSizeFrequencyCalculus;
-import diego.ufu.workloadoutput.calculus.AllocDeallocBehaviorCalculus;
 import diego.ufu.workloadoutput.calculus.FrequencyOperationCalculus;
 import diego.ufu.workloadoutput.calculus.QuantitiesCalculus;
 import diego.ufu.workloadoutput.calculus.SizeFrequencyCalculus;
@@ -19,29 +17,30 @@ import diego.ufu.workloadoutput.calculus.TotalTimeCalculus;
  */
 public class Main {
 
-	private static final String POS_FIX = "Size Frequency";
-	/*
-	 * ------- Parameters ---------
-	 * Please see populateExperiment and mainly addCalculus method
-	 * FIXME: This should be done in a better way to increase the flexibility 
+	/**
+	 * @Parameter
+	 * Index of the replications analyzes
+	 * 	[REPLICATION_BEGIN, REPLICATION_END]
+	 * 
 	 */
 	private static final int REPLICATION_BEGIN = 2;
-	private static final int REPLICATION_END = 2;
+	private static final int REPLICATION_END = 30;
 	
-	private static boolean shouldCalculateTimeRetention = false;
-	private static boolean shouldOnlyCalculateTimeRetention = false;
-	
-	private static boolean calculateOnlyAllocDeallocBehavior = false; // PRIORITY
-	private static boolean totalTime = false;
-	private static boolean shouldOnlyCalculateSizeFrequency = true;
-	// ----------------------------
-	// 
-	private static boolean calculateForBigAlgorithms = false;
+	/** 
+	 * Input File Format
+	 * Current format = path + fileName + _ + replication + .csv 
+	 *					(eg. path = C:\ filename = MySQL_malloc | 3 Replications
+	 *					C:\MySQL_malloc_1.csv, C:\MySQL_malloc_2.csv, C:\MySQL_malloc_3.csv)
+	 * See Main.generateFileName method to check how this is used)
+	 */
+	private static String inputFileNameFormat = "%s" + "%s" + "_" + "%s" + ".csv";
 	
 	static FileReader reader;
 	static StatisticAnalysis analysis;
-	
 	static List<Experiment> experiments = new ArrayList<>();
+	
+	private static String pathFolder;
+	
 	
 	/**
 	 * @param args
@@ -49,41 +48,46 @@ public class Main {
 	public static void main(String[] args) {
 		
 			
-			 populateExperiments();
+		 populateExperiments();
+		 
+		 analysis = new StatisticsAnalysisImpl();
+		 addCalculusModule();
+		 
+		 for(Experiment exp : experiments) {
 			 
-			 analysis = new StatisticsAnalysisImpl();
-			 addCalculusModule();
+			 System.out.println("[INFO] Starting the Workload Output Program");
+			 System.out.println("[INFO] Parameters");
+			 System.out.println("[INFO] Start Replications:" + REPLICATION_BEGIN);
+			 System.out.println("[INFO] End Replications: " + REPLICATION_END);
+			 System.out.println("[INFO] Input Path Folder: " + exp.getPath());
+			 System.out.println("[INFO] Output Path File: " + exp.getOutputFile());
+			 System.out.println("[INFO] Malloc File Pattern: " + exp.getMallocFileName());
+			 System.out.println("[INFO] Free File Pattern: " + exp.getFreeFileName());
 			 
-			 for(Experiment exp : experiments) {
+			 try {
+				 // Measuring the time spent in the analysis
+				 long startTime = System.currentTimeMillis();
+				 // Execute the analysis
+				 executeAnalysis(exp);
+				 long endTime = System.currentTimeMillis();
 				 
-				 System.out.println("[INFO] Starting the Workload Output Program");
-				 System.out.println("[INFO] Parameters");
-				 System.out.println("[INFO] Start Replications:" + REPLICATION_BEGIN);
-				 System.out.println("[INFO] End Replications: " + REPLICATION_END);
-				 System.out.println("[INFO] Input Path Folder: " + exp.getPath());
-				 System.out.println("[INFO] Output Path File: " + exp.getOutputFile());
-				 System.out.println("[INFO] Malloc File Pattern: " + exp.getMallocFileName());
-				 System.out.println("[INFO] Free File Pattern: " + exp.getFreeFileName());
-				 
-				 try {
-					 executeExperiment(exp);
-				 } catch (Exception e) {
-					 e.printStackTrace();
-				 }
-			 
+				 System.out.println("[INFO] Time elapsed (seconds): " 
+						 			+ ((endTime - startTime) / 1000));
+			 } catch (Exception e) {
+				 e.printStackTrace();
 			 }
+		 
+		 }
 			
 	}
 
-	private static void executeExperiment(Experiment exp) throws Exception {
+	private static void executeAnalysis(Experiment exp) throws Exception {
 		
-		
-		 long startTime = System.currentTimeMillis();
-		
-		 reader = new FileReaderImpl(exp.getPath());
+		 reader = new FileReaderImpl();
+		 pathFolder = exp.getPath();
 
-		 StringBuffer stringbuffer = new StringBuffer();
-		 stringbuffer.append(analysis.printHeader());
+		 StringBuilder programReport = new StringBuilder();
+		 programReport.append(analysis.printHeader());
 		 
 		 System.out.println("[INFO] Reading: ");
 		 System.out.print("     ");
@@ -91,94 +95,140 @@ public class Main {
 		 // Get all the replications
 		 for(int i = REPLICATION_BEGIN; i <= REPLICATION_END; i++) {
 			 System.out.print(" | " + i + " | ");
-			 // Read the file
-			 MallocInfo info = reader.loadFile(exp.getMallocFileName(), exp.getFreeFileName(), i);
+			 
+			 // Generate the malloc/free file name pattern
+			 String mallocFileName = generateFileName(exp.getMallocFileName(), i);
+			 String freeFileName = generateFileName(exp.getFreeFileName(), i);
+			 
+			 // Read both malloc/free file
+			 MallocInfo info = reader.loadFile(mallocFileName, 
+					 freeFileName);
+			 
 			 // Generate the Report
 			 StringBuffer report = analysis.generateReport(info);
-			 stringbuffer.append(report);
+			 
+			 // Add to the report 
+			 programReport.append(report);
 		 }
 		 
 		 System.out.println("[INFO] Writing the output file...");
 		 // Write the into in the output file
-		 Utils.writeFile(exp.getOutputFile(), stringbuffer);
-		 
-		 long endTime = System.currentTimeMillis();
-		 
-		 System.out.println("[INFO] Time elapsed (seconds): " 
-				 			+ ((endTime - startTime) / 1000));
+		 Utils.writeFile(exp.getOutputFile(), programReport);
 		
 	}
+	
+	/**
+	 * Generate the FileName of the malloc/free operations based on the
+	 * inputNameFormat variable
+	 * 
+	 * @param fileName
+	 * @param replicationID
+	 * @return
+	 */
+	private static String generateFileName(String fileName, int replicationID) {
+		return String.format(inputFileNameFormat, pathFolder, fileName, replicationID);
+	}
+
 
 	/**
 	 * Here I add the INFO about each experiment that should be analyzed
 	 */
 	private static void populateExperiments() {
 		
-		// MySQL
-		experiments.add(new Experiment("mySQL_malloc", "mySQL_free", "D:/UFU/WC - MySQL/", "D:/UFU/WC - Result/MySQL " + POS_FIX +".csv"));
-	
-		// Lynx
-		experiments.add(new Experiment("lynx_malloc", "lynx_free", "D:/UFU/WC - Lynx/", "D:/UFU/WC - Result/Lynx " + POS_FIX + ".csv"));
-		
-		// Octave Simple
-		experiments.add(new Experiment("octave_malloc", "octave_free", "D:/UFU/WC - Octave/", "D:/UFU/WC - Result/Octave Simple " + POS_FIX + ".csv"));
-		
-		// Octave Complex
-		experiments.add(new Experiment("octave_malloc", "octave_free", "D:/UFU/WC - Octave_Complex/", "D:/UFU/WC - Result/Octave Complex " + POS_FIX + ".csv"));
-		
-		// VLCPlayer Audio
-		experiments.add(new Experiment("vlcplayer_malloc", "vlcplayer_free", "D:/UFU/WC - VLCPlayer/Audio/", "D:/UFU/WC - Result/VLCPlayer Audio " + POS_FIX + ".csv"));
-		
-		// VLCPlayer Video
-		experiments.add(new Experiment("vlcplayer_malloc", "vlcplayer_free", "D:/UFU/WC - VLCPlayer/Video/", "D:/UFU/WC - Result/VLCPlayer Video " + POS_FIX + ".csv"));
-		
-		// Cherokee
-		experiments.add(new Experiment("cherokee_malloc", "cherokee_free", "D:/UFU/WC - Cherokee/", "D:/UFU/WC - Result/Cherokee " + POS_FIX + ".csv"));
-	
-		if(calculateForBigAlgorithms) {
-			// Inkscape
-			experiments.add(new Experiment("inkscape_malloc", "inkscape_free", "D:/UFU/WC - Inkscape/", "D:/UFU/WC - Result/Inkscape " + POS_FIX + ".csv"));
-			
-			// CodeBlocks
-			experiments.add(new Experiment("codeblock_malloc", "codeblock_free", "D:/UFU/WC - CodeBlocks/", "D:/UFU/WC - Result/CodeBlocks " + POS_FIX + ".csv"));
-			
-		}
-		
+		/**
+		 * @Parameter
+		 * Here you should add the experiment that should be analyzed with the 
+		 * four specified parameters (path, mallocFile, freeFile, outputFilePath)
+		 * 
+		 */
+		// Example: MySQL
+		experiments.add(new ExperimentBuilder()
+				.withPath("D:/UFU/WC - MySQL/")
+				.withMallocFileName("mySQL_malloc")
+				.withFreeFileName("mySQL_free")
+				.withOutputFilePath("D:/UFU/WC - Result/MySQL_Result.csv")
+				.build());
 	}
 
 	/**
-	 * In this method we decide WHICH analyze should be done
+	 * In this method we decide WHICH analyze should be performed
 	 */
 	private static void addCalculusModule() {
 		
-		if(totalTime) {
+			/**
+			 * @Parameter
+			 * Retrieves the total time of the experiment
+			 * Total Time Experiment = time from the first to the last 
+			 * dynamic memory operation (alloc/dealloc)
+			 */
 			analysis.addCalculusModule(new TotalTimeCalculus());
-			return;
-		}
 		
-		if(shouldOnlyCalculateSizeFrequency) {
-			analysis.addCalculusModule(new AllSizeFrequencyCalculus());
-			return;
-		}
 		
-		if(calculateOnlyAllocDeallocBehavior) {
-			analysis.addCalculusModule(new AllocDeallocBehaviorCalculus());
-			//analysis.addCalculusModule(new AllocDeallocGroupCalculus());
-			return; // FIXME
-		}
-		
-		if(!shouldOnlyCalculateTimeRetention) {
+			/**
+			 * @Parameter
+			 * Analyzes the quantities of allocations/deallocations
+			 *  # of Allocations
+			 *	# of Deallocations                    
+			 *	# of NULL Deallocations                
+			 *	% non-deallocated allocations  -> (alloc - dealloc)/ alloc       
+			 *	Total of Requested Memory  
+			 *  Average Size of Allocation    
+			 */
 			analysis.addCalculusModule(new QuantitiesCalculus());
+			
+			/**
+			 * @Parameter
+			 * Analyzes the frequency of the allocation operation (malloc, realloc, cealloc)
+			 * 	# malloc() 
+			 *	# calloc() 
+			 *	# realloc()
+			 *	% malloc() 
+			 *	% calloc() 
+			 *	% realloc()
+			 */
 			analysis.addCalculusModule(new FrequencyOperationCalculus());
+			
+			/**
+			 * @Parameter
+			 * Analyzes the frequency of the allocated sizes by Size Category (SC)
+			 * 	Frequency by SC (see SizeCategory class)
+			 *  Distinct allocated sizes by SC (see SizeCategory class)
+			 *  10 Most allocated sizes
+			 *  Number of distinct size allocations (total)
+			 */
 			analysis.addCalculusModule(new SizeFrequencyCalculus());
-			analysis.addCalculusModule(new TotalTimeCalculus());
-		}
 		
-		if(shouldCalculateTimeRetention || shouldOnlyCalculateTimeRetention) {
-			//analysis.addCalculusModule(new TimeRetentionCalculus());
+			/**
+			 * @Parameter
+			 * Analyzes the Retention Time (RT) of the allocations
+			 * For each TimeRetentionCategory (see TimeRetentionCategory class) it provides:
+			 *  Average RT
+             *  RT Variance 
+             *  RT Standard Deviation
+             *  Minimum RT
+             *  Maximum RT
+			 */
 			analysis.addCalculusModule(new SmartTimeRetentionCalculus());
-		}
-		
+			
+			/**
+			 * @Parameter
+			 * This is a temporal analyzes between allocation/deallocation
+			 * This should not be used with the other analyzes as it brings 
+			 * a huge amount of data (basically all alloc and dealloc sorted 
+			 * by time)
+			 */
+			//analysis.addCalculusModule(new AllocDeallocBehaviorCalculus());
+			
+			/**
+			 * @Parameter
+			 * Analyzes the sizes frequency and returns a map containing
+			 * 	[allocation size = # of allocations]
+			 * This should not be used with the other analyzes and should be executed 
+			 * per replication as it brings two columns with [size] [# of allocations]
+			 *  
+			 *	  
+			 */
+			//analysis.addCalculusModule(new AllSizeFrequencyCalculus());
 		
 	}
 

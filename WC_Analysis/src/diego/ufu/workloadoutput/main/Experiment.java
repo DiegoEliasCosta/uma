@@ -11,15 +11,7 @@ public class Experiment {
 	String freeFileName;
 	String path;
 	String outputFile;
-	
-	public Experiment(String mallocFileName, String freeFileName,
-			String path, String outputFile) {
-		super();
-		this.mallocFileName = mallocFileName;
-		this.freeFileName = freeFileName;
-		this.path = path;
-		this.outputFile = outputFile;
-	}
+
 
 	public String getMallocFileName() {
 		return mallocFileName;

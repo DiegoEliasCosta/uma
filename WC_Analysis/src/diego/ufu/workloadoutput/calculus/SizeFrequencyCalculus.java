@@ -29,9 +29,6 @@ public class SizeFrequencyCalculus implements CalculusModule {
 		
 		StringBuffer buffer = new StringBuffer();
 		
-		//buffer.append("Quantidade por Tamanhos (Tamanho=#) " + SEPARATOR)
-		//.append("Distribuicao Frequencia dos Tamanhos (Tamanho=%)" + SEPARATOR)
-		//buffer.append("Distribuição por Categoria (Categoria=%)" + SEPARATOR)
 		buffer.append("Frequencia - C1" + SEPARATOR)
 		.append("Frequencia - C2" + SEPARATOR)
 		.append("Frequencia - C3" + SEPARATOR)
@@ -84,12 +81,6 @@ public class SizeFrequencyCalculus implements CalculusModule {
 		
 		StringBuilder buffer = new StringBuilder();
 		
-		// # 
-		//printMallocNumberBySize(buffer, mallocBySize, sortedKeys);
-		
-		// %
-		//printMallocPercentageBySize(buffer, mallocBySize, sortedKeys, numberOfAllocations);
-		
 		// Category
 		printCategoryBySize(buffer, mallocBySize, sortedKeys, numberOfAllocations);
 		
@@ -116,9 +107,7 @@ public class SizeFrequencyCalculus implements CalculusModule {
 		MostAllocatedControl control = new MostAllocatedControl(numberOfMostAllocation);
 		
 		for(Integer size : mallocBySize.keySet()) {
-			
 			control.insertElement(size, mallocBySize.get(size).size());
-			
 		}
 		
 		List<AllocationFrequency> mostAllocatedSizes = control.getMostAllocatedSizes();
@@ -129,9 +118,6 @@ public class SizeFrequencyCalculus implements CalculusModule {
 			  .append(allocFrequency.getFrequency())
 			  .append(SEPARATOR);
 		}
-		
-		
-		
 		
 	}
 
@@ -175,41 +161,6 @@ public class SizeFrequencyCalculus implements CalculusModule {
 				  .append(SEPARATOR);
 		}
 		
-	}
-
-	@SuppressWarnings("unused")
-	private void printMallocPercentageBySize(StringBuilder buffer,
-			Map<Integer, List<MallocBean>> mallocBySize, Object[] sortedKeys, int numberOfAllocations) {
-		
-		buffer.append("{");
-		for(Object key : sortedKeys) {
-			  buffer.append(key) 
-			        .append("=")
-			        .append(frequency(mallocBySize.get(key), numberOfAllocations))
-			        .append(", ");
-		}
-		buffer.append("}" + SEPARATOR);
-		
-	}
-
-	@SuppressWarnings("unused")
-	private void printMallocNumberBySize(StringBuilder buffer,
-			Map<Integer, List<MallocBean>> mallocBySize, Object[] keys) {
-		
-		for(Object key : keys) {
-			  buffer.append(key + "=" + mallocBySize.get(key).size() + ", ");
-		}
-		buffer.append("}" + SEPARATOR);
-	}
-	
-
-
-	private String frequency(int count, int numberOfAllocations) {
-		return "" + (count / (float) numberOfAllocations * 100);
-	}
-
-	private String frequency(List<MallocBean> beanList, int numberOfAllocations) {
-		return frequency(beanList.size(), numberOfAllocations);
 	}
 
 }

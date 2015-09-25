@@ -2,8 +2,6 @@ package diego.ufu.workloadoutput.calculus;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import diego.ufu.workloadoutput.bean.MallocBean;
 import diego.ufu.workloadoutput.main.MallocInfo;
@@ -63,16 +61,6 @@ public class AllSizeFrequencyCalculus implements CalculusModule {
 		}
 		
 		return builder;
-	}
-
-	private Integer getMaxSize(Map<Integer, Integer> sizesByFrequency) {
-		
-		Set<Integer> keySet = sizesByFrequency.keySet();
-
-		// Sort
-		TreeSet<Integer> treeSet = new TreeSet<>(keySet);
-		return treeSet.pollLast();
-		
 	}
 
 }

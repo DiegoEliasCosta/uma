@@ -62,7 +62,7 @@ public class Utils {
 		
 	}
 
-	public static void writeFile(String fileName, StringBuffer content) throws IOException {
+	public static void writeFile(String fileName, StringBuilder content) throws IOException {
 		
 	        BufferedWriter out = new BufferedWriter(new FileWriter(fileName));  
 	        out.append(content.toString());  
